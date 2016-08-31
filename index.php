@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', '0');
 
-$root_dir = ".";
+$root_dir = getcwd();
 
 require 'vendor/autoload.php';
 
@@ -15,6 +15,8 @@ $log_dir = "$root_dir/logs";
 $template_dir = "$root_dir/templates";
 $content_dir = "$root_dir/content";
 $remote_dir = "https://lists.w3.org/";
+$cacert_dir = "$root_dir/cacert";
+$cacert_bundle = "$cacert_dir/_w3_org.pem";
 
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
@@ -38,6 +40,7 @@ $app->get('{path:.*}', function (Request $request, Response $response, $args) {
 	$contents = 'FILE NOT FOUND';
 	$path = $args['path'];
 	$contents = get_file($path);
+	
 	$response = $this->view->render($response, "default.php", ["contents" => $contents ]);
 	return $response;
 });
@@ -117,12 +120,14 @@ function fetch($url) {
 		$path = $url;
 	}
 
+	global $cacert_bundle;
 	$client = new Client([
 		'base_uri' => $actual_remote_dir,
 		'timeout'  => 5.0,
+		'verify' => $cacert_bundle,
 		'allow_redirects' => false
 	]);
-		
+
 	$rr = $client->request('GET', $path);
 	return $rr;
 }
@@ -143,10 +148,8 @@ function localize_content($content, $type) {
 	$elts = $xpath->query("//a[contains(@title, '$mid_msg')]");
 	foreach ($elts as $elt) {
 		$href = $elt->getAttribute('href');
-echo $href;
 		$url = localize_url($href);
 		if (!$url) { // TODO can we indicate a dead In-Reply-To??
-echo $url;
 			$elt->parentNode->removeChild($elt);
 			continue;
 		}
