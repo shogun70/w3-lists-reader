@@ -1,0 +1,89 @@
+@import url("home-import.css");
+
+/* Copyright 1997-2005 W3C (MIT, ERCIM, Keio). All Rights Reserved.
+   The following software licensing rules apply:
+   http://www.w3.org/Consortium/Legal/copyright-software */
+
+/* $Id: home.css,v 2.22 2005/05/16 15:59:14 slesch Exp $ */
+
+/* ******************  body  *************** */
+
+html, body {
+   background: #fff;
+   color: #000;
+}
+
+html, body, h2, h3, h4, div, p, ul, li, input {
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+#logo, #slogan {
+   text-align: center;
+   margin: 0;
+   padding: 0;
+   margin-bottom: 0.3em;
+}
+
+#slogan {
+   background: #fff;
+   color: #4d8cba;
+   font-family: Times, "Times New Roman", serif;
+   font-style: italic;
+   font-weight: bold;
+   margin-top: -6px;
+}
+
+.date {
+   padding-right: 0.3em;
+}
+
+.small, .archive, .copyright {
+   font-size: small;
+}
+
+.invisible, .invisible a {
+   display: none;
+   background: #fff;
+   color: #fff;
+}
+
+.copyright {
+   margin-top: 0;
+   margin-bottom: 0;
+}
+
+.hide {
+   visibility: hidden;
+   background: #fff;
+   color: #fff;
+   clear: both;
+   margin: 0;
+}
+
+.whiteout {
+   background: #fff;
+   color: #fff;
+}
+
+a:link {
+   background: #fff;
+   color: #037;
+}
+
+a:visited {
+   background: #fff;
+   color: #636;
+}
+
+a:active {
+   background: #ffc;
+   color: #900;
+   text-decoration: none;
+}
+
+a img { color: #fff; }         /* hide the border in Netscape 4 */
+@media all {                   /* hide from Netscape 4 */
+   a img { color: inherit;     /* undo the rule above */
+   border: none;               /* hide from Netscape 4 */
+   }
+}

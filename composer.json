@@ -1,0 +1,9 @@
+{
+    "require": {
+        "slim/slim": "^3.0",
+        "guzzlehttp/guzzle": "~6.0",
+        "slim/php-view": "^2.1",
+        "slim/http-cache": "^0.3.0",
+        "monolog/monolog": "^1.21"
+    }
+}
