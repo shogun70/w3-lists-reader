@@ -55,9 +55,23 @@ function get_file_async($path) {
 function get_file($path) {
 	global $content_dir;
 	$local_path = "$content_dir$path";
-	if (file_exists($local_path)) return file_get_contents($local_path);
+	if (preg_match('/\/$/', $local_path)) $local_path .= 'index.html';
+	if (file_exists($local_path)) return get_file_contents($local_path);
 	return generate_file($path);
 }
+
+function get_file_contents($path) {
+	$fh = fopen($path, 'r');
+	flock($fh, LOCK_SH);
+	$contents = file_get_contents($path);
+	flock($fh, LOCK_UN);
+	return $contents;
+}
+
+function put_file_contents($path, $contents) {
+	file_put_contents($path, $contents, LOCK_EX);
+}
+
 
 function generate_file_async($path) {
 	return (new FulfilledPromise())
