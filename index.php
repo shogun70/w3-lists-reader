@@ -81,9 +81,11 @@ function localize_url($url) {
 
 	if (!$host) return $url;
 
+	$path = $uri->getPath();
+
+	if ($host == 'lists.w3.org') return $path;
 	if ($host != 'www.w3.org') return $url;
 
-	$path = $uri->getPath();
 	if (preg_match('/^\/StyleSheets\//', $path)) {
 		if (!preg_match('/\.css$/', $path)) $path = $path . '.css';
 		return $path;
