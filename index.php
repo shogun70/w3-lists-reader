@@ -123,6 +123,8 @@ function fetch($url) {
 	global $cacert_bundle;
 	$client = new Client([
 		'base_uri' => $actual_remote_dir,
+		'headers' => [ 'Accept-Encoding' => 'gzip,deflate' ],
+		'decode_content' => true,
 		'timeout'  => 5.0,
 		'verify' => $cacert_bundle,
 		'allow_redirects' => false
