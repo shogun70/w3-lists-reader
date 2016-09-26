@@ -104,46 +104,6 @@ $app->get('/Archives/Public/{list:[-A-Za-z0-9]+}/[{period:\d{4}[A-Za-z]{3}}/[{it
 	return $response;
 });
 
-$app->get('/Archives/Public/{list:[-A-Za-z0-9]+}/{page:\d{4}}.html', function (Request $request, Response $response, $args) {
-	$contents = 'FILE NOT FOUND';
-	$list = $args['list'];
-	$page = $args['page'];
-	$path = $request->getUri()->getPath();
-	
-	global $content_dir;
-	global $template_dir;
-	global $lists_proxy;
-	global $mid_resolver;
-
-	$list_handler = new ListHandler($list, $content_dir, $template_dir, $lists_proxy, $mid_resolver);
-
-	$contents = $list_handler->get_threads_page($page);
-
-	$contents = php_render($template_dir . "/default.php", ["contents" => $contents ]);
-	$response->write($contents);
-	return $response;
-});
-
-$app->get('/Archives/Public/{list:[-A-Za-z0-9]+}/threads.html', function (Request $request, Response $response, $args) {
-	$contents = 'FILE NOT FOUND';
-	$list = $args['list'];
-	$page = $args['page'];
-	$path = $request->getUri()->getPath();
-	
-	global $content_dir;
-	global $template_dir;
-	global $lists_proxy;
-	global $mid_resolver;
-
-	$list_handler = new ListHandler($list, $content_dir, $template_dir, $lists_proxy, $mid_resolver);
-
-	$contents = $list_handler->get_threads_index();
-
-	$contents = php_render($template_dir . "/default.php", ["contents" => $contents ]);
-	$response->write($contents);
-	return $response;
-});
-
 $app->get('/Archives/Public/', function (Request $request, Response $response) {
 	$contents = 'FILE NOT FOUND';
 	$path = $request->getUri()->getPath();
