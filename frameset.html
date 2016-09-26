@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+
+document.addEventListener('click', function(e) {
+	var el = Meeko.DOM.closest(e.target, 'label[for=""]');
+	if (!el) return;
+	while (el = el.previousElementSibling) {
+		if (!Meeko.DOM.matches(el, 'input')) continue;
+		el.click();
+		break;
+	}
+}, false);
+
+</script>
+</head>
+<body>
+<script for>
+({
+lookup: function(url, details) {
+	var nextURL = Meeko.URL(url)
+	if (nextURL.host !== location.host) { // should never happen
+		location.replace(url + '?no_boot'); // FIXME
+		return true;
+	}
+	var pathParts = nextURL.pathname.substr(1).split('/');
+	if (pathParts.length < 2 || pathParts[0] !== 'Archives' || pathParts[1] !== 'Public') { // should never happen
+		location.replace(url + '?no_boot'); // FIXME
+		return true;
+	}
+	if (!pathParts[2]) { // mainindex
+		// return 'hf_mainindex'; // shouldn't need to do this - it is hard-coded
+		return true;
+	}
+	var listname = pathParts[2];
+	// FIXME test that listname is supported
+	if (!pathParts[3]) { // messageslist
+		return 'hf_messagelist';
+	}
+	if (!pathParts[4]) { // should never happen
+		location.replace(url + '?no_boot'); // FIXME
+		return true;
+	}
+
+	return 'hf_message';
+}
+})
+</script>
+
+<hf-layer>
+	<hf-hlayout>
+		<hf-frame width="30%" targetname="hf_mainindex" src="scope:/Archives/Public/" main="#info-search + .full + .full">
+			<hf-body>
+				<hf-transform type="main">
+				</hf-transform>
+			<hf-body>
+		</hf-frame>
+
+		<hf-vlayout width="70%" overflow="hidden">
+			<hf-frame height="40%" overflow="auto" targetname="hf_messagelist" main="body">
+
+<style scoped>/* scoped styles must be child of hf-frame */
+ul, li { 
+	list-style-type: none; 
+	padding-left: 0;
+	margin-left: 0;
+}
+ul ul {
+	padding-left: 1em;
+}
+input[type=checkbox] { display: none; }
+input[type=checkbox] + label::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
+input[type=checkbox]:checked + label::after { content: '▼'; }
+input[type=checkbox]:not(:checked) + label::after { content: '▶'; }
+input[type=checkbox]:disabled + label::after { content: '\00a0'; }
+</style>
+
+				<hf-body>
+					<hf-transform type="hazard" format="css">
+
+<form action="javascript:void(0);">
+<script for>
+({
+	onsubmit: function() { return false; },
+	onreset: function() { return false; },
+	onchange: function(e) { 
+		var input = e.target;
+		if (input.type !== 'checkbox') return;
+		var item = Meeko.DOM.closest(input, 'li');
+		if (!item) return; // WARN should never occur
+		var link = Meeko.DOM.find('a[href]', item);
+		link.focus();
+
+		var open = input.checked;
+		var panel = item.lastElementChild;
+		if (panel.contains(input)) {
+			// panel is ancestor of input means there is no panel
+			input.checked = false;
+			input.disabled = true;
+			return;
+		}
+		panel.hidden = !open;
+	},
+	onkeydown: function(e) { 
+		if (e.ctrlKey || e.metaKey || e.altKey) return;
+		var link = Meeko.DOM.closest(e.target, 'a[href]');
+		if (!link) return;
+		var item = Meeko.DOM.closest(link, 'li');
+		if (!item) return;
+		var input;
+		var node = link;
+		while (node = node.previousElementSibling || node.parentNode) {
+			if (node === item) return;
+			if (!Meeko.DOM.matches(node, 'input[type=checkbox]')) continue;
+			input = node;
+			break;
+		}
+		switch (e.keyCode) {
+		case 39: // ArrowRight
+			e.preventDefault();
+			if (!input.checked) input.click();
+			break;
+		case 37: // ArrowLeft
+			e.preventDefault();
+			if (input.checked) input.click();
+			break;
+		case 40: // ArrowDown
+			e.preventDefault();
+			var iter = document.createTreeWalker(
+					e.currentTarget, 
+					1, 
+					function() { return 1; },
+					false
+				);
+			iter.currentNode = item;
+			var nextItem;
+			while (nextItem = iter.nextNode()) {
+				if (!Meeko.DOM.matches(nextItem, 'li')) continue;
+				if (!Meeko.DOM.isVisible(nextItem)) continue;
+				break;
+			};
+			if (!nextItem) return;
+			var nextLink = Meeko.DOM.find('a[href]', nextItem);
+			nextLink.focus(); // thankfully this takes care of scrolling-into-view
+			break;
+		case 38: // ArrowUp
+			e.preventDefault();
+			var iter = document.createTreeWalker(
+					e.currentTarget, 
+					1, 
+					function() { return 1 },
+					false
+				);
+			iter.currentNode = item;
+			var prevItem;
+			while (prevItem = iter.previousNode()) {
+				if (!Meeko.DOM.matches(prevItem, 'li')) continue;
+				if (!Meeko.DOM.isVisible(prevItem)) continue;
+				break;
+			}
+			if (!prevItem) return;
+			var prevLink = Meeko.DOM.find('a[href]', prevItem);
+			prevLink.focus(); // thankfully this takes care of scrolling-into-view
+			break;
+		}
+	}
+})
+</script>
+	<ul>
+		<haz:one select=".newest .threads a[href]">
+			<hf-frame expr:src="{ @href }" main="body" defid="hf_threads" replace>
+				<hf-body>
+					<hf-transform type="hazard" format="css">
+
+<haz:one select=".messages-list">
+	<haz:each select="ul li">
+		<li>
+			<div>
+			<input type="checkbox" /><label for></label>
+			<a expr:href="> a[href] { @href }" expr:_html="> a[href] { _html }"></a>
+			<b expr:_html="> a > em { _html }"></b>
+			<i expr:_html="> em { _html }"></i>
+			</div>
+			<hf-frame expr:src="a[href] { @href }" defid="hf_reply" hidden>
+				<script for>
+				({
+				bodyEntered: function(frame, body) {
+					var item = Meeko.DOM.find('li', body);
+					if (item) {
+						item.scrollIntoView(false);
+						return;
+					}
+					var item = Meeko.DOM.closest(frame.element, 'li');
+					if (!item) return; // WARN should never occur
+					var input = Meeko.DOM.find('input[type=checkbox]', item);
+					input.checked = false;
+					input.disabled = true;
+				}
+				})
+				</script>
+				<hf-body>
+					<hf-transform type="hazard" format="css">
+<haz:if test="#navbarfoot > ul.links > li a[href][title*=reply]">
+	<ul>
+		<haz:each select="#navbarfoot > ul.links > li a[href][title*=reply]">
+			<li>
+				<div>
+				<input type="checkbox" /><label for></label>
+				<a expr:href="{ @href }" expr:_html="{ _html }"></a>
+				</div>
+				<hf-frame expr:src="{ @href }" def="hf_reply" hidden></hf-frame>
+			</li>
+		</haz:each>
+	</ul>
+</haz:if>
+					</hf-transform>
+				</hf-body>
+			</hf-frame>
+		</li>
+	</haz:each>
+</haz:one>
+<haz:one select=".next a[rel=next]">
+	<hf-frame expr:src="{ @href }" def="hf_threads" replace>
+	</hf-frame>
+</haz:one>
+
+					</hf-transform>
+				</hf-body>
+			</hf-frame>
+		</haz:one>
+	</ul>
+</form>
+
+					</hf-transform>
+				<hf-body>
+			</hf-frame>
+		
+			<hf-frame height="60%" overflow="auto" targetname="hf_message" main=".mail">
+				<script for>
+({
+	bodyEntered: function(frame, body) {
+		var src = frame.element.getAttribute('src');
+		var threadsUrl = src.replace(/\/\d{4}[A-Za-z]{3}\/\d{4}.html$/, '/');
+		var target = Meeko.DOM.find('hf-frame[targetname=hf_messagelist]');
+		if (target.getAttribute('src') !== threadsUrl) target.setAttribute('src', threadsUrl);
+	}
+})
+				</script>
+				<hf-body>
+					<hf-transform type="main">
+					</hf-transform>
+				<hf-body>
+			</hf-frame>
+		</hf-vlayout>
+	</hf-hlayout>
+</hf-layer>
+
+</body>
+</html>
+
