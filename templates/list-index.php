@@ -3,33 +3,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>public-houdini@w3.org Mail Archives</title>
-<link rel="help" href="/Help/" />
-<link rel="contents" title="List of public mailing lists" href="../" />
-<link rel="stylesheet" href="//www.w3.org/StyleSheets/Mail/public-mainindex" />
-<link rel="alternate" type="application/rss+xml" title="RSS 1.0" href="feed.rss" />
+<title><?= $list['name'] ?>@w3.org Mail Archives</title>
+<link rel="stylesheet" href="/StyleSheets/Mail/public-mainindex.css" />
 </head>
 <body>
-    <div class="head">
-      <map title="Navigation bar to upper levels" id="upper"
-      name="upper">
+    <nav title="Navigation bar to upper levels" class="upper">
         <p>
 			<a href="//www.w3.org/" title="W3C home">W3C home</a> &gt; 
 			<a href="../">Public Mailing lists</a>
 		</p>
-      </map> 
+      </nav> 
 
-<h1><?= $list_name ?> Mail Archives</h1>
-<div class="header">
-<p>This mailing list serves as the discussion forum for the Houdini joint task force between CSS WG and TAG on the design of styling APIs. </p>
-<p>the official wiki for this TF can be found at <a href="https://wiki.css-houdini.org">https://wiki.css-houdini.org</a>.</p>
+<header>
 
-</div><!--class=header-->
-      <map title="Navigation bar" id="navbar" name="navbar">
-        <ul>
-       </ul>
-      </map>
-    </div>
+		<h1><?= $list['name'] ?> Mail Archives</h1>
+		<?= $list['details'] ?>
+</header>
+
 <?php 
 	$month_strings = preg_split('/\s+/', <<<'END'
 January February March April May June July August September October November December
@@ -88,12 +78,8 @@ END
 </tbody>
 
 </table>
-<div class="footer">
 
-</div><!--class=footer-->
-<hr />
-<address>
-<a href="//www.w3.org/Help/Webmaster">Webmaster</a><!--a href="mailto:team-lists-torimochi@w3.org">do not post to me</a--><br />
-Last update on: Thu Sep 22 16:19:34 2016
-</address>
+<footer>
+</footer>
+
 </body></html>

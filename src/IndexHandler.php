@@ -11,6 +11,7 @@ class IndexHandler {
 	private $cache_dir;
 	private $template_dir;
 	private $http_proxy;
+	private $lists;
 
 	public function __construct($index_file, $cache_dir, $template_dir, $http_proxy) {
 		$this->index_file = $index_file;
@@ -20,6 +21,10 @@ class IndexHandler {
 	
 		$base_path = self::$base_path;
 		$this->path = $base_path;
+
+		$lists_string = file_get_contents($this->index_file);
+		$this->lists = preg_split("/\s+/", $lists_string);
+
 		return $this;
 	}
 
@@ -27,11 +32,63 @@ class IndexHandler {
 		$path = $this->path;
 		$local_path = $this->cache_dir . $path;
 		if (preg_match('/\/$/', $local_path)) $local_path .= 'index.html';
+
 		if (file_exists($local_path)) return get_file_contents($local_path);
 
-		$contents = $this->render_index($path);
-		put_file_contents($local_path, $contents);
+		$contents = $this->render_index2($path);
+//		put_file_contents($local_path, $contents);
 		return $contents;
+	}
+
+	private function render_index2($path) {
+		$type = 'public-index';
+		$template_dir = $this->template_dir;
+		$dom = $this->fetch_document($path);
+
+		$info = $this->extract_list_info($dom);
+
+		$info = $this->filter_list_info($info);
+
+		$template_path = "$template_dir/$type.php";
+		
+		$contents = php_render($template_path, [ 'lists' => $info ]);
+		return $contents;
+	}
+
+	private function extract_list_info($dom) {
+		$xpath = new DOMXPath($dom);
+		$inactive_header = $xpath->query("//*[@id='inactive']")[0];
+		$inactive_list = $xpath->query("following-sibling::*", $inactive_header)[0];
+		$inactive_header->parentNode->removeChild($inactive_header);
+		$inactive_list->parentNode->removeChild($inactive_list);
+
+		$info = [];
+		$items = $xpath->query("//dl/dt");
+		foreach ($items as $dt) {
+			$name = $dt->getAttribute('id');
+			$link = $xpath->query("a[@href][1]", $dt)[0];
+			$path = $link->getAttribute('href');
+			$dd = $xpath->query("following-sibling::dd[1]", $dt)[0];
+			$details = '';
+			foreach ($dd->childNodes as $node) {
+				$details .= $dom->saveHTML($node);
+			}
+			
+			array_push($info, [
+				'name' => $name,
+				'path' => $path,
+				'details' => $details
+			]);
+		}
+
+		return $info;
+	}
+
+
+	private function filter_list_info($items) {
+		return array_filter($items, function($item) {
+			return in_array($item['name'], $this->lists);
+		});
 	}
 
 	private function render_index($path) {

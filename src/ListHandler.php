@@ -6,7 +6,6 @@ class ListHandler {
 
 	private static $base = 'https://lists.w3.org/';
 	private static $base_path = '/Archives/Public/';
-	private static $page_size = 20;
 
 	private static $db_definition =<<<"END"
 
@@ -210,6 +209,7 @@ END
 		foreach ($periods as $i => $per) {
 			if ($per['path'] === $path) $period_index = $i;
 		}
+		$period = $periods[$period_index];
 		$older_period = $periods[$period_index + 1];
 		$newer_period = $periods[$period_index - 1];
 		$older_path = $older_period ? $older_period['path'] . 'new-threads.html' : false;
@@ -217,7 +217,11 @@ END
 
 
 		$template_path = "$template_dir/$type.php";
-		$params = [ messages => $threads ];
+		$params = [ 
+			'list' => [ name => $this->list_name ],
+			'period' => $period,
+			'messages' => $threads 
+		];
 		if ($older_path) $params['older'] = [ 'path' => $older_path ];
 		if ($newer_path) $params['newer'] = [ 'path' => $newer_path ];
 		$contents = php_render($template_path, $params);

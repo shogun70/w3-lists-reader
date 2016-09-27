@@ -1,19 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<script>
-
-document.addEventListener('click', function(e) {
-	var el = Meeko.DOM.closest(e.target, 'label[for=""]');
-	if (!el) return;
-	while (el = el.previousElementSibling) {
-		if (!Meeko.DOM.matches(el, 'input')) continue;
-		el.click();
-		break;
-	}
-}, false);
-
-</script>
+<meta charset="UTF-8" />
+<style>
+* { font-family: arial; }
+</style>
 </head>
 <body>
 <script for>
@@ -50,7 +41,7 @@ lookup: function(url, details) {
 
 <hf-layer>
 	<hf-hlayout>
-		<hf-frame width="30%" targetname="hf_mainindex" src="scope:/Archives/Public/" main="#info-search + .full + .full">
+		<hf-frame width="30%" targetname="hf_mainindex" src="scope:/Archives/Public/" main="main">
 			<hf-body>
 				<hf-transform type="main">
 				</hf-transform>
@@ -70,10 +61,10 @@ ul ul {
 	padding-left: 1em;
 }
 input[type=checkbox] { display: none; }
-input[type=checkbox] + label::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
-input[type=checkbox]:checked + label::after { content: '▼'; }
-input[type=checkbox]:not(:checked) + label::after { content: '▶'; }
-input[type=checkbox]:disabled + label::after { content: '\00a0'; }
+input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
+input[type=checkbox]:checked + span::after { content: '▼'; }
+input[type=checkbox]:not(:checked) + span::after { content: '▶'; }
+input[type=checkbox]:disabled + span::after { content: '\00a0'; }
 </style>
 
 				<hf-body>
@@ -108,14 +99,7 @@ input[type=checkbox]:disabled + label::after { content: '\00a0'; }
 		if (!link) return;
 		var item = Meeko.DOM.closest(link, 'li');
 		if (!item) return;
-		var input;
-		var node = link;
-		while (node = node.previousElementSibling || node.parentNode) {
-			if (node === item) return;
-			if (!Meeko.DOM.matches(node, 'input[type=checkbox]')) continue;
-			input = node;
-			break;
-		}
+		var input = Meeko.DOM.find('input[type=checkbox]', item);
 		switch (e.keyCode) {
 		case 39: // ArrowRight
 			e.preventDefault();
@@ -177,7 +161,7 @@ input[type=checkbox]:disabled + label::after { content: '\00a0'; }
 	<haz:each select="ul li">
 		<li>
 			<div>
-			<input type="checkbox" /><label for></label>
+			<label><input type="checkbox" /><span></span></label>
 			<a expr:href="> a[href] { @href }" expr:_html="> a[href] { _html }"></a>
 			<b expr:_html="> a > em { _html }"></b>
 			<i expr:_html="> em { _html }"></i>
@@ -206,7 +190,7 @@ input[type=checkbox]:disabled + label::after { content: '\00a0'; }
 		<haz:each select="#navbarfoot > ul.links > li a[href][title*=reply]">
 			<li>
 				<div>
-				<input type="checkbox" /><label for></label>
+				<label><input type="checkbox" /><span></span></label>
 				<a expr:href="{ @href }" expr:_html="{ _html }"></a>
 				</div>
 				<hf-frame expr:src="{ @href }" def="hf_reply" hidden></hf-frame>
