@@ -20,15 +20,6 @@
 <header>
 <h1><?= $list['name'] ?>@w3.org from <?= $period['label'] ?> by new threads</h1>
 
-<nav title="Navigation bar" class="navbar">
-<ul>
-  <li>
-    <dfn>About this list</dfn>: 
-    [ <a href="./new-threads.html" title="Messages index grouped by threads">Index by threads</a> ]
-    [ <a href="./" title="Messages index grouped by calendar periods">Index by calendar periods</a> ]
-  </li>
-</ul>
-</nav>
 </header>
 
 <?php if ($newer): ?>

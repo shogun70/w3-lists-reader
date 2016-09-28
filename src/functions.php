@@ -47,6 +47,13 @@ function parse_html($markup) {
 	}
 	return $doc;
 }
+
+function inner_html($el) {
+	$doc = $el->ownerDocument;
+	$text = '';
+	foreach ($el->childNodes as $node) $text .= $doc->saveHTML($node);
+	return $text;
+}
 	
 function xslt_proc($template, $dom, $args = null) {
 	$xsl = new DOMDocument;

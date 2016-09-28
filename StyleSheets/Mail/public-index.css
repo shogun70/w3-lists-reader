@@ -60,8 +60,22 @@ footer {
   font-size: small;
 }
 
+header p, header h1 {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0.5em; 
+}
+
 ul, li {
   list-style: none;
+}
+
+dt + dd {
+  margin-top: 0.5em;
+}
+
+dd + dt {
+  margin-top: 1em;
 }
 
 main { 
@@ -75,11 +89,4 @@ main ul, main li {
   padding-left: 0;
 }
 
-.next {
-  text-align: center;
-}
-.next a {
-  padding: 0.5em;
-  /* border: 1px solid #444;
-  background-color: #ddd; */
-}
+

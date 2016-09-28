@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -16,7 +15,7 @@
 
 <header>
 
-		<h1><?= $list['name'] ?> Mail Archives</h1>
+		<h1><?= $list['name'] ?>@w3.org Mail Archives</h1>
 		<?= $list['details'] ?>
 </header>
 
@@ -31,7 +30,7 @@ END
 		$month_names[$index] = $name;
 	}
 ?>
-<table border="0" cellspacing="3" cellpadding="2"><!-- FIXME use CSS -->
+<table><!-- FIXME use CSS -->
 
  <thead>
    <tr>
@@ -80,6 +79,10 @@ END
 </table>
 
 <footer>
+<p>
+<?php $canonical_url = "https://lists.w3.org" . $list['path']; ?>
+The original source for this page is <a rel="canonical" href="<?= $canonical_url ?>"><?= $canonical_url ?></a>.
+</p>
 </footer>
 
 </body></html>

@@ -1,20 +1,61 @@
-/* Copyright 1997-2003 W3C (MIT, ERCIM, Keio). All Rights Reserved.
-   The following software licensing rules apply:
-   http://www.w3.org/Consortium/Legal/copyright-software */
+[hidden] { 
+	display: none; 
+}
 
-/* $Id: public-message.css,v 1.23 2015-01-06 20:28:42 ylafon Exp $ */
+html {
+  font-family: arial, sans-serif;
+  background-color: white;
+  color: black;
+  text-align: center;
+}
 
-/* W3C Message Archive - public message */
+body {
+  max-width: 80ex;
+  margin: 0 auto;
+  text-align: left;
+}
 
-@import url(/StyleSheets/base.css);
-@import url(/StyleSheets/Mail/message.css);
+a:link, a:active {
+  color: #6495ed;
+}
 
-/* Leave message itself white but rest
-** of metadata very pale grey
-**  Note the public background is white so here we only need to set grey
-*/
+a:visited {
+  color: #3232ff;
+}
 
-body { color: black; background: #eee; } 
+a:link img, a:visited img {
+   border: none;
+}
 
-/* ... */
+pre {
+  font-family: monospace;
+  white-space: pre-wrap;
+  padding: 0.5em; 
+}
 
+dfn {
+	font-weight: bold;
+	color: #942525;
+}
+
+h1 { 
+	color: #444;
+}
+
+.mail, #headers { 
+	border-bottom: 2px solid #444;
+	padding-bottom: 0.5em;
+}
+
+#replies {
+	margin-top: 0.5em;
+}
+
+nav ul, nav li {
+  list-style: none;
+}
+
+footer {
+  padding-top: 1em;
+  font-size: small;
+}

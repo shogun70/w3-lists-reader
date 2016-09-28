@@ -1,21 +1,92 @@
-/* Copyright 1997-2003 W3C (MIT, ERCIM, Keio). All Rights Reserved.
-   The following software licensing rules apply:
-   http://www.w3.org/Consortium/Legal/copyright-software */
+[hidden] { 
+	display: none; 
+}
 
-/* $Id: public-mainindex.css,v 1.23 2003/01/21 02:50:51 slesch Exp $ */
+html {
+  font-family: arial, sans-serif;
+  background-color: white;
+  color: black;
+  text-align: center;
+}
 
-/* Style sheet for Public email archives 
-**
-** Example page: 
-**   http://lists.w3.org/Archives/Public/www-talk/
-**
-** This file was empty - it needed something tbl
-*/
+body {
+  max-width: 80ex;
+  margin: 0 auto;
+  text-align: left;
+}
 
-@import url(/StyleSheets/base.css);
+a:link, a:active {
+  color: #6495ed;
+}
 
-@import url(/StyleSheets/Mail/mainindex.css);
+a:visited {
+  color: #3232ff;
+}
 
+a:link img, a:visited img {
+   border: none;
+}
 
+pre {
+  font-family: monospace;
+  white-space: pre-wrap;
+  padding: 0.5em; 
+}
 
+dfn {
+	font-weight: bold;
+	color: #942525;
+}
+
+h1 { 
+	color: #444;
+}
+
+.mail, #headers { 
+	border-bottom: 2px solid #444;
+	padding-bottom: 0.5em;
+}
+
+#replies {
+	margin-top: 0.5em;
+}
+
+nav ul, nav li {
+  list-style: none;
+}
+
+footer {
+  padding-top: 1em;
+  font-size: small;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+table thead tr {
+  border-bottom: 2px solid #444;
+}
+
+table tbody tr {
+  border-bottom: 1px solid #444;
+}
+
+table thead tr th:first-child {
+  visibility: hidden;
+}
+
+table thead th {
+  text-align: center;
+}
+
+table td {
+  text-align: center;
+  padding: 10px 5px;
+}
+
+.messages, .threads {
+  display: inline-block;
+}
 

@@ -9,6 +9,13 @@ class ListHandler {
 
 	private static $db_definition =<<<"END"
 
+	CREATE TABLE list(
+		id INTEGER PRIMARY KEY,
+		path TEXT UNIQUE,
+		name TEXT UNIQUE,
+		details TEXT
+	);
+
 	CREATE TABLE period(
 		id INTEGER PRIMARY KEY,
 		path TEXT UNIQUE,
@@ -101,7 +108,7 @@ END;
 		$local_path = $this->cache_dir . $path;
 		if (file_exists($local_path)) return get_file_contents($local_path);
 
-		$contents = $this->render_message($path);
+		$contents = $this->render_message_php($path);
 		put_file_contents($local_path, $contents);
 		return $contents;
 	}
@@ -139,8 +146,17 @@ END
 			$years["$y"]["$m"] = $data;
 		}
 
+		$list = $this->fetch_one(<<<"END"
+
+			SELECT * FROM list;
+END
+		);
+
 		$template_path = "$template_dir/$type.php";		
-		$params = [ 'years' => $years ];
+		$params = [ 
+			'list' => $list,
+			'years' => $years 
+		];
 		$contents = php_render($template_path, $params);
 
 		$template_path = "$template_dir/$type.xsl";
@@ -160,7 +176,7 @@ END
 	}
 
 	private function render_period($path) {
-		$type = 'message-period';
+		$type = 'message-list';
 		$dom = $this->fetch_document($path);
 		$dom = $this->localize_period($dom);
 
@@ -189,15 +205,14 @@ END
 		);
 
 		$threads = iterator_to_array($threads);
-		foreach ($threads as &$thread) { // WARN updating original objects
+		foreach ($threads as $i => $thread) { // WARN updating original objects
 			$date = date_create_from_format('Y-m-d', $thread['date']);
-			$thread['date'] = $date;
+			$threads[$i]['date'] = $date;
 /* FIXME datetime isn't stored in database
 			$datetime = date_create_from_format('Y-m-d H:i:s', $thread['datetime']);
-			$thread['datetime'] = $datetime;
+			$threads[$i]['datetime'] = $datetime;
 */
 		}
-		unset($thread);
 
 		$periods = $dbh->query(<<<"END"
 
@@ -234,7 +249,7 @@ END
 		return $dom->saveHTML();
 	}
 
-	private function render_message($path) {
+	private function render_message_xsl($path) {
 		$type = 'message';
 		$dom = $this->fetch_document($path);
 		$dom = $this->localize_message($dom);
@@ -272,6 +287,119 @@ END
 		return $dom;
 	}
 
+	private function render_message_php($path) {
+		$type = 'message';
+		$dom = $this->fetch_document($path);
+		$message = $this->scrape_message($dom);
+
+		$path_dir = dirname($path) . '/';
+
+		$in_reply_to_path = $this->scrape_in_reply_to($dom);
+		if ($in_reply_to_path && strpos($in_reply_to_path, '/') !== 0) $in_reply_to_path = $path_dir . $in_reply_to_path;
+
+		$replies_paths = $this->scrape_replies($dom); // FIXME lookup in db
+		foreach ($replies_paths as $i => $reply) {
+			if (strpos($reply, '/') !== 0) $replies_paths[$i] = $path_dir . $reply;
+		}
+
+		$record = $this->fetch_one(<<<"END"
+		
+		SELECT * FROM message WHERE path="$path";
+END
+		);
+		$message['path'] = $record['path']; // FIXME copy all fields
+
+		foreach (preg_split('/\s+/', trim($record['replies'])) as $reply_path) {
+			if ($reply_path && !in_array($reply_path, $replies_paths)) array_push($replies_paths, $reply_path);
+		}
+
+		if ($in_reply_to_path) $in_reply_to = $this->fetch_one(<<<"END"
+
+		SELECT * FROM message WHERE path="$in_reply_to_path";
+
+END
+		);
+
+		// TODO convert date-strings into DateTime
+
+		if ($in_reply_to) $message['in_reply_to'] = $in_reply_to;
+
+		$replies = [];
+		foreach ($replies_paths as $i => $reply) {
+			$result = $this->fetch_one(<<<"END"
+
+			SELECT * FROM message WHERE path="$reply";
+END
+			);
+			if ($result) array_push($replies, $result);
+		}
+
+		$period = $this->fetch_one(<<<"END"
+
+		SELECT * FROM period WHERE path="$path_dir";
+END
+		);
+
+		$info = [
+			'list' => [ 'name' => $this->list_name ],
+			'period' => $period,
+			'message' => $message,
+			'replies' => $replies
+		];
+
+		$template_dir = $this->template_dir;
+		$template_path = "$template_dir/$type.php";
+		
+		$contents = php_render($template_path, $info);
+		return $contents;
+	}
+
+	private function fetch_one($query) {
+		$results = $this->db_handle->query($query);
+		$results = iterator_to_array($results);
+		if (count($results)) return $results[0];
+	}
+
+	private function scrape_message($dom) {
+		$meta = $this->get_message_meta($dom);
+		$bodyElement = $dom->getElementById('body');
+		$body = inner_html($bodyElement);
+		$meta['content'] = $body;
+		return $meta;
+	}
+
+	private function scrape_in_reply_to($dom) {
+		$xpath = new DOMXPath($dom);
+		$elts = $xpath->query("//*[@id='navbar']//a[contains(.,'In reply to')]");
+
+		if ($elts->length <= 0) return; // FIXME Found an orphan. What to do??
+		$elt = $elts[0];
+
+		if (strcasecmp($elt->parentNode->tagName, 'del') === 0) return; // FIXME in_reply_to broken-link
+
+		$href = $elt->getAttribute('href');
+
+		//if (strpos($href, $this->list_path) !== 0) return; // FIXME in_reply_to another list. What to do??
+		return $href;
+	}
+	
+	private function scrape_replies($dom) {
+		$replies = [];
+
+		$xpath = new DOMXPath($dom);
+		$elts = $xpath->query("//*[@id='navbarfoot']//a[@href][contains(@title,'in reply to')]");
+
+		foreach ($elts as $elt) {
+			if (strcasecmp($elt->parentNode->tagName, 'del') === 0) { // TODO how to best indicate broken In-Reply-To??
+				continue;
+			}
+			$path = $elt->getAttribute('href');
+//			if (strpos($path, $this->list_path) !== 0) continue;
+			array_push($replies, $path);
+		}
+		return $replies;
+	}
+
 
 	private function open_db($db_file) {
 		$this->db_handle = $dbh = new PDO("sqlite:$db_file");
@@ -289,16 +417,31 @@ END
 
 	private function init_list() {
 
+		$list_path = $this->list_path;
+		$list_name = $this->list_name;
+
 		$contents = $this->http_proxy->get($this->list_path);
 		$dom = parse_html($contents);
 
 		$xpath = new DOMXPath($dom);
+
+		$dbh = $this->db_handle;
+		$details_el = $xpath->query("//*[@class='header']")->item(0);
+		$details = inner_html($details_el);
+
+		$sth = $dbh->prepare(<<<"END"
+
+			INSERT INTO list (path, name, details) VALUES (?, ?, ?);
+END
+		);
+		$sth->execute([ $list_path, $list_name, $details ]);
+		
+
 		$rows = $xpath->query("//table/tbody/tr");
 		$rows = array_reverse(iterator_to_array($rows)); // $rows are now oldest first
 
 		foreach ($rows as $row) $this->init_period($row, $xpath);
 
-		$dbh = $this->db_handle;
 		$rows = $dbh->query(<<<"END"
 
 			SELECT * FROM period ORDER BY start_date ASC;
@@ -515,7 +658,9 @@ END
 		$author = preg_split('/\s*\(/', $authorElt->getAttribute('content'))[0];
 		$subjectElt = $xpath->query("//meta[@name='Subject']")[0];
 		$subject = $subjectElt->getAttribute('content');
-		return (['author' => $author, 'subject' => $subject]);
+		$dateElt = $xpath->query("//meta[@name='Date']")[0];
+		$date = date_create_from_format('Y-m-d', $dateElt->getAttribute('content'));
+		return (['author' => $author, 'subject' => $subject, 'date' => $date ]);
 	}
 
 

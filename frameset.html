@@ -185,9 +185,9 @@ input[type=checkbox]:disabled + span::after { content: '\00a0'; }
 				</script>
 				<hf-body>
 					<hf-transform type="hazard" format="css">
-<haz:if test="#navbarfoot > ul.links > li a[href][title*=reply]">
+<haz:if test="#replies ul > li a[href]">
 	<ul>
-		<haz:each select="#navbarfoot > ul.links > li a[href][title*=reply]">
+		<haz:each select="#replies ul > li a[href]">
 			<li>
 				<div>
 				<label><input type="checkbox" /><span></span></label>
