@@ -3,7 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <style>
-* { font-family: arial; }
+html { 
+	font-family: arial; 
+	background-color: white;
+	color: black;
+}
+a:link, a:visited {
+	color: cornflowerblue;
+}
+
+/* put some space around top-level frame bodies */
+hf-frame > hf-body { margin: 1em; }
+hf-frame > hf-body hf-frame > hf-body { margin: 0 }
 </style>
 </head>
 <body>
@@ -41,9 +52,104 @@ lookup: function(url, details) {
 
 <hf-layer>
 	<hf-hlayout>
+
 		<hf-frame width="30%" targetname="hf_mainindex" src="scope:/Archives/Public/" main="main">
+			<style scoped>
+dt + dd { margin-top: 0.5em; }
+dd + dt { margin-top: 1em; }
+dd { margin-left: 0; padding-left: 0; }
+dt label { font-size: 0.6em; background-color: #888; color: white; border-radius: 0.6em;  padding: 0 0.6em; }
+input[type=checkbox] { display: none; }
+input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
+input[type=checkbox]:checked + span::after { content: '▼'; }
+input[type=checkbox]:not(:checked) + span::after { content: '▶'; }
+input[type=checkbox]:disabled + span::after { content: '\00a0'; }
+		</style>
 			<hf-body>
-				<hf-transform type="main">
+				<hf-transform type="hazard" format="css">
+<form action="javascript:void(0);">
+<script for> // FIXME merge this with the expand / collapse code in thread window
+({
+	onsubmit: function() { return false; },
+	onreset: function() { return false; },
+	onchange: function(e) { 
+		var input = e.target;
+		if (input.type !== 'checkbox') return;
+		var item = Meeko.DOM.closest(input, 'dt');
+		if (!item) return; // WARN should never occur
+		var link = Meeko.DOM.find('a[href]', item);
+		link.focus();
+
+		var open = input.checked;
+		var panel = item.nextElementSibling;
+		panel.hidden = !open;
+	},
+	onkeydown: function(e) { 
+		if (e.ctrlKey || e.metaKey || e.altKey) return;
+		var link = Meeko.DOM.closest(e.target, 'a[href]');
+		if (!link) return;
+		var item = Meeko.DOM.closest(link, 'dt');
+		if (!item) return;
+		var input = Meeko.DOM.find('input[type=checkbox]', item);
+		switch (e.keyCode) {
+		case 39: // ArrowRight
+			e.preventDefault();
+			if (!input.checked) input.click();
+			break;
+		case 37: // ArrowLeft
+			e.preventDefault();
+			if (input.checked) input.click();
+			break;
+		case 40: // ArrowDown
+			e.preventDefault();
+			var nextItem = item;
+			while (nextItem = nextItem.nextElementSibling) {
+				if (!Meeko.DOM.matches(nextItem, 'dt')) continue;
+				break;
+			};
+			if (!nextItem) return;
+			var nextLink = Meeko.DOM.find('a[href]', nextItem);
+			nextLink.focus(); // thankfully this takes care of scrolling-into-view
+			break;
+		case 38: // ArrowUp
+			e.preventDefault();
+			var prevItem = item;
+			while (prevItem = prevItem.previousElementSibling) {
+				if (!Meeko.DOM.matches(prevItem, 'dt')) continue;
+				break;
+			}
+			if (!prevItem) return;
+			var prevLink = Meeko.DOM.find('a[href]', prevItem);
+			prevLink.focus(); // thankfully this takes care of scrolling-into-view
+			break;
+		}
+	}
+})
+</script>
+<haz:one select="dl">
+	<haz:apply></haz:apply>
+</haz:one>
+
+<haz:template match="dt">
+	<haz:clone>
+		<haz:each select="> *">
+			<haz:apply></haz:apply>
+		</haz:each>
+		&nbsp;<label><input type="checkbox" /><span>Details&nbsp;</span></label>
+	</haz:clone>
+</haz:template>
+
+</form>
+				</hf-transform>
+				<hf-transform type="script">
+					<script for>
+({
+transform: function(srcNode) {
+	Meeko.stuff.forEach(Meeko.DOM.findAll('dd', srcNode), function(dd) { dd.hidden = true; });
+	return srcNode;
+}
+})
+					</script>
 				</hf-transform>
 			<hf-body>
 		</hf-frame>
