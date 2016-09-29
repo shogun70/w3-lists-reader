@@ -236,7 +236,7 @@ END
 
 		$template_path = "$template_dir/$type.php";
 		$params = [ 
-			'list' => [ name => $this->list_name ],
+			'list' => [ 'name' => $this->list_name ],
 			'period' => $period,
 			'messages' => $threads 
 		];
@@ -470,7 +470,6 @@ END
 		$href = $this->list_path . $rel_href;
 		$datestring = basename($rel_href) . '01';
 		$date = date_create_from_format('YMd', $datestring);
-if ($date === false) print "$href: $datestring, ";
 		$start_date = date_format($date, 'Y-m-d');
 
 		$count_cell = $cells[4];
@@ -511,10 +510,8 @@ END
 		$subject = $xpath->evaluate("string(a[1])", $item);
 		$author = $xpath->evaluate("string(a[2]/em)", $item);
 		$datestring = $xpath->evaluate("string(em)", $item);
-if ($datestring === false) print "$href: $datestring, ";
 		$datestring .= date_format($start_date, 'Y');
 		$date = date_create_from_format('\(l, d F\)Y', $datestring);
-if ($date === false) print "$href: $datestring, ";
 		$datestring = date_format($date, 'Y-m-d');
 
 		$dbh = $this->db_handle;
