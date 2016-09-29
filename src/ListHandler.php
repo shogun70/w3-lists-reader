@@ -142,7 +142,7 @@ END
 			];
 			if ($i === 0) $data['position'] = 'newest';
 			if ($i === count($periods) - 1) $data['position'] = 'oldest';
-			if (!$years["$y"]) $years["$y"] = self::create_empty_year();
+			if (!array_key_exists("$y", $years)) $years["$y"] = self::create_empty_year();
 			$years["$y"]["$m"] = $data;
 		}
 
@@ -212,7 +212,14 @@ END
 			$datetime = date_create_from_format('Y-m-d H:i:s', $thread['datetime']);
 			$threads[$i]['datetime'] = $datetime;
 */
-			if ($thread['no_contemporary_replies'] && !$thread['replies']) {
+			if (
+				array_key_exists('no_contemporary_replies', $thread) && 
+				$thread['no_contemporary_replies'] === 1 && 
+				!(
+					array_key_exists('replies', $thread) && 
+					trim($thread['replies'])
+				)
+			) {
 				$threads[$i]['no_replies'] = true;
 			}
 		}
