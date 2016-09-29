@@ -62,7 +62,8 @@ END
 			SELECT * FROM record WHERE mid="$mid";
 END
 		);
-		return iterator_to_array($records)[0]; // FIXME what if more than one record
+		$records = iterator_to_array($records);
+		return count($records) ? $records[0] : false; // FIXME what if more than one record
 	}
 
 	private function add_referrer($mid, $referrer) {
@@ -77,9 +78,9 @@ END
 
 	public function resolve($mid, $referrer) {
 		$record = $this->get_record($mid);
-		if ($record && $record['id']) {
+		if ($record && array_key_exists('id', $record)) {
 			$this->add_referrer($mid, $referrer);
-			if ($record['success']) return $record['path'];
+			if (array_key_exists('success', $record) && $record['success']) return $record['path'];
 			else return null;
 		}
 
