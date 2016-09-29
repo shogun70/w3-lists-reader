@@ -37,7 +37,7 @@ class ListHandler {
 		in_reply_to TEXT,
 		replies TEXT,
 		contemporary_root TEXT,
-		root TEXT
+		no_contemporary_replies INTEGER
 	);
 	CREATE INDEX message_path ON message(path);
 
@@ -212,6 +212,9 @@ END
 			$datetime = date_create_from_format('Y-m-d H:i:s', $thread['datetime']);
 			$threads[$i]['datetime'] = $datetime;
 */
+			if ($thread['no_contemporary_replies'] && !$thread['replies']) {
+				$threads[$i]['no_replies'] = true;
+			}
 		}
 
 		$periods = $dbh->query(<<<"END"
@@ -531,8 +534,17 @@ END
 	}
 
 	private function crosslink_item($item) {
+		$dbh = $this->db_handle;
 		$path = $item['path'];
 		$dom = $this->fetch_document($path);
+
+		$replies = $this->scrape_replies($dom);
+		if (count($replies) === 0) $dbh->exec(<<<"END"
+
+		UPDATE message SET no_contemporary_replies=1 WHERE path="$path";
+END
+		);
+		
 		$xpath = new DOMXPath($dom);
 		$elts = $xpath->query("//a[contains(.,'In reply to')]");
 		if ($elts->length <= 0) return; // FIXME Found an orphan. What to do??
@@ -544,7 +556,6 @@ END
 		if (strpos($href, $this->list_path) !== 0) { // FIXME in_reply_to another list. What to do??
 			return;
 		}
-		$dbh = $this->db_handle;
 		$dbh->exec(<<<"END"
 
 		UPDATE message SET in_reply_to="$href" WHERE path="$path";

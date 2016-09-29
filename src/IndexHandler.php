@@ -36,7 +36,7 @@ class IndexHandler {
 		if (file_exists($local_path)) return get_file_contents($local_path);
 
 		$contents = $this->render_index2($path);
-//		put_file_contents($local_path, $contents);
+		put_file_contents($local_path, $contents);
 		return $contents;
 	}
 

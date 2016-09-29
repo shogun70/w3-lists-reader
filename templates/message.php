@@ -49,7 +49,13 @@
 
 <?php foreach ($replies as $reply): ?>
 
-<li><a href="<?= $reply['path'] ?>" title="Message sent in reply to this message"><?= $reply['author'] ?>: "<span><?= $reply['subject'] ?></span>" (<time datetime="<?= $reply['date'] ?>"><?= $reply['date'] ?></time>)</a></li>
+<li>
+<a href="<?= $reply['path'] ?>" title="Message sent in reply to this message">
+<em class="author"><?= $reply['author'] ?></em>: 
+"<span class="subject"><?= $reply['subject'] ?></span>" 
+(<time datetime="<?= $reply['date'] ?>"><?= $reply['date'] ?></time>)
+</a>
+</li>
 
 <?php endforeach; ?>
 </ul>

@@ -122,6 +122,17 @@ $app->get('/Archives/Public/', function (Request $request, Response $response) {
 	return $response;
 });
 
+$app->get('/', function (Request $request, Response $response) {
+	$contents = 'FILE NOT FOUND';
+	$path = $request->getUri()->getPath();
+	
+	global $content_dir;
+	$contents = get_file_contents("$content_dir/index.html");
+
+	$response->write($contents);
+	return $response;
+});
+
 
 $app->run();
 

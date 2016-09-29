@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <style>
+* {
+	box-sizing: border-box;
+}
 html { 
 	font-family: arial; 
 	background-color: white;
@@ -53,14 +56,14 @@ lookup: function(url, details) {
 <hf-layer>
 	<hf-hlayout>
 
-		<hf-frame width="30%" targetname="hf_mainindex" src="scope:/Archives/Public/" main="main">
+		<hf-frame width="40ex" targetname="hf_mainindex" src="scope:/Archives/Public/" main="main" style="border-right: 1px solid #888;">
 			<style scoped>
 dt + dd { margin-top: 0.5em; }
 dd + dt { margin-top: 1em; }
 dd { margin-left: 0; padding-left: 0; }
 dt label { font-size: 0.6em; background-color: #888; color: white; border-radius: 0.6em;  padding: 0 0.6em; }
 input[type=checkbox] { display: none; }
-input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
+input[type=checkbox] + span::after { font-size: 0.6em; font-family: monospace; content: '\00a0'; }
 input[type=checkbox]:checked + span::after { content: '▼'; }
 input[type=checkbox]:not(:checked) + span::after { content: '▶'; }
 input[type=checkbox]:disabled + span::after { content: '\00a0'; }
@@ -154,8 +157,8 @@ transform: function(srcNode) {
 			<hf-body>
 		</hf-frame>
 
-		<hf-vlayout width="70%" overflow="hidden">
-			<hf-frame height="40%" overflow="auto" targetname="hf_messagelist" main="body">
+		<hf-vlayout width="calc(100vw - 40ex)" overflow="hidden">
+			<hf-frame height="40%" overflow="auto" targetname="hf_messagelist" main="body" style="border-bottom: 1px solid #888;">
 
 <style scoped>/* scoped styles must be child of hf-frame */
 ul, li { 
@@ -166,6 +169,11 @@ ul, li {
 ul ul {
 	padding-left: 1em;
 }
+li > div { width: 100%; height: 1.5em; position: relative; white-space: nowrap; }
+/* TODO contain thread summary within the view
+li > div time { position: absolute; right: 0; width: 12ex; }
+li > div b { position: absolute; right: 12ex; width: 20ex; }
+*/
 input[type=checkbox] { display: none; }
 input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
 input[type=checkbox]:checked + span::after { content: '▼'; }
@@ -267,10 +275,16 @@ input[type=checkbox]:disabled + span::after { content: '\00a0'; }
 	<haz:each select="ul li">
 		<li>
 			<div>
-			<label><input type="checkbox" /><span></span></label>
-			<a expr:href="> a[href] { @href }" expr:_html="> a[href] { _html }"></a>
-			<b expr:_html="> a > em { _html }"></b>
-			<i expr:_html="> em { _html }"></i>
+			<label>
+				<input type="checkbox" haz:unless="> div .no_replies" />
+				<input type="checkbox" disabled haz:if="> div .no_replies" />
+				<span></span>
+			</label>
+			<a expr:href=" a[href] { @href }" expr:_html=".subject { _html }"></a>
+			<b expr:_html=".author { _html }"></b>
+			<haz:one select="time">
+			<time expr:datetime="{@datetime}" expr:_html="{@datetime}"></time>
+			</haz:one>
 			</div>
 			<hf-frame expr:src="a[href] { @href }" defid="hf_reply" hidden>
 				<script for>
@@ -293,13 +307,17 @@ input[type=checkbox]:disabled + span::after { content: '\00a0'; }
 					<hf-transform type="hazard" format="css">
 <haz:if test="#replies ul > li a[href]">
 	<ul>
-		<haz:each select="#replies ul > li a[href]">
+		<haz:each select="#replies ul > li">
 			<li>
 				<div>
 				<label><input type="checkbox" /><span></span></label>
-				<a expr:href="{ @href }" expr:_html="{ _html }"></a>
+				<a expr:href="a[href] { @href }" expr:_html=".subject { _html }"></a>
+				<b expr:_html=".author { _html }"></b>
+				<haz:one select="time">
+				<time expr:datetime="{@datetime}" expr:_html="{@datetime}"></time>
+				</haz:one>
 				</div>
-				<hf-frame expr:src="{ @href }" def="hf_reply" hidden></hf-frame>
+				<hf-frame expr:src="a[href] { @href }" def="hf_reply" hidden></hf-frame>
 			</li>
 		</haz:each>
 	</ul>
@@ -337,6 +355,21 @@ input[type=checkbox]:disabled + span::after { content: '\00a0'; }
 	}
 })
 				</script>
+				<style scoped>
+hf-body { /* reset */
+	margin: 0;
+	padding: 0;
+}
+#headers, #body {
+	width: 100%;
+	margin: 0;
+	padding: 1em;
+}
+#headers {
+	background-color: #ddd;
+	border-bottom: 1px solid #888;
+}
+				</style>
 				<hf-body>
 					<hf-transform type="main">
 					</hf-transform>

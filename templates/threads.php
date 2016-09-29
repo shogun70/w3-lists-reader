@@ -31,7 +31,17 @@
 <main class="messages-list">
 <ul>
 <?php foreach ($messages as $message): ?>
-<li><a href="<?= $message['path'] ?>"><?= htmlspecialchars($message['subject'], ENT_QUOTES) ?></a>&nbsp;<a><em><?= htmlspecialchars($message['author'], ENT_QUOTES) ?></em></a>&nbsp;<em>(<time datetime="<?= date_format($message['date'], 'Y-m-d') ?>"><?= date_format($message['date'], 'l, d F Y') ?></time>)</em>
+<li>
+	<a href="<?= $message['path'] ?>">
+		<span class="subject"><?= htmlspecialchars($message['subject'], ENT_QUOTES) ?></span>
+	</a>&nbsp;
+	<em class="author"><?= htmlspecialchars($message['author'], ENT_QUOTES) ?></em>&nbsp;
+	<em>(<time datetime="<?= date_format($message['date'], 'Y-m-d') ?>"><?= date_format($message['date'], 'l, d F Y') ?></time>)</em>
+	<?php if ($message['no_replies']): ?>
+	<strong title="No replies" class="no_replies">*</strong>
+	<?php endif; ?>
+
+</li>
 <?php endforeach; ?>
 </ul>
 </main>
