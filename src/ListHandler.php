@@ -470,6 +470,7 @@ END
 		$href = $this->list_path . $rel_href;
 		$datestring = basename($rel_href) . '01';
 		$date = date_create_from_format('YMd', $datestring);
+if ($date === false) print "$href: $datestring, ";
 		$start_date = date_format($date, 'Y-m-d');
 
 		$count_cell = $cells[4];
@@ -510,8 +511,10 @@ END
 		$subject = $xpath->evaluate("string(a[1])", $item);
 		$author = $xpath->evaluate("string(a[2]/em)", $item);
 		$datestring = $xpath->evaluate("string(em)", $item);
+if ($datestring === false) print "$href: $datestring, ";
 		$datestring .= date_format($start_date, 'Y');
 		$date = date_create_from_format('\(l, d F\)Y', $datestring);
+if ($date === false) print "$href: $datestring, ";
 		$datestring = date_format($date, 'Y-m-d');
 
 		$dbh = $this->db_handle;
@@ -584,11 +587,11 @@ END
 		foreach ($thread_starters as $item) {
 			$path = $item['path'];
 			$period_path = dirname($path) . '/';			
-			if (!$period_new_threads[$period_path]) {
-				$period_new_threads[$period_path] = 1;
+			if (array_key_exists($period_path, $period_new_threads)) {
+				$period_new_threads[$period_path]++;
 			}
 			else {
-				$period_new_threads[$period_path]++;
+				$period_new_threads[$period_path] = 1;
 			}
 		}
 		foreach ($period_new_threads as $path => $count) {

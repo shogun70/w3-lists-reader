@@ -23,5 +23,10 @@
         "files": [ 
             "src/functions.php"
         ]
+    },
+    "scripts": {
+	"post-install-cmd": [
+		"Scripts::postInstall"
+        ]
     }
 }

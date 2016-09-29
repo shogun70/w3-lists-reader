@@ -38,7 +38,7 @@ libxml_use_internal_errors(true);
 function parse_html($markup) {
 	$doc = new DOMDocument;
 	$success = $doc->loadHTML($markup);
-	if (!success) {
+	if (!$success) {
 		foreach (libxml_get_errors() as $error) {
 			// TODO
 		}
