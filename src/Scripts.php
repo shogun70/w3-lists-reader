@@ -1,6 +1,6 @@
 <?php
 
-//ini_set('display_errors', '0');
+ini_set('display_errors', '0');
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -27,6 +27,13 @@ $content_dir = "$root_dir/content";
 $remote_dir = "https://$lists_host/";
 $cacert_dir = "$root_dir/cacert";
 $cacert_bundle = "$cacert_dir/_w3_org.pem";
+
+$log_file = "$log_dir/install.log";
+$logger = new \Monolog\Logger('my_logger');
+$file_handler = new \Monolog\Handler\StreamHandler($log_file);
+$logger->pushHandler($file_handler);
+ErrorHandler::register($logger);
+
 
 $lists_cache_dir = "$root_dir/$lists_host";
 $lists_client = new Client([
