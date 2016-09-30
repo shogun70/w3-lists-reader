@@ -63,10 +63,10 @@ dd + dt { margin-top: 1em; }
 dd { margin-left: 0; padding-left: 0; }
 dt label { font-size: 0.6em; background-color: #888; color: white; border-radius: 0.6em;  padding: 0 0.6em; }
 input[type=checkbox] { display: none; }
-input[type=checkbox] + span::after { font-size: 0.6em; font-family: monospace; content: '\00a0'; }
-input[type=checkbox]:checked + span::after { content: '▼'; }
-input[type=checkbox]:not(:checked) + span::after { content: '▶'; }
-input[type=checkbox]:disabled + span::after { content: '\00a0'; }
+input[type=checkbox] + span::after { font-size: 0.6em; font-family: monospace; content: ' \00a0 '; }
+input[type=checkbox]:checked + span::after { content: " \25bc "; }
+input[type=checkbox]:not(:checked) + span::after { content: " \25b6 "; }
+input[type=checkbox]:disabled + span::after { content: " \00a0 "; }
 		</style>
 			<hf-body>
 				<hf-transform type="hazard" format="css">
@@ -175,10 +175,10 @@ li > div time { position: absolute; right: 0; width: 12ex; }
 li > div b { position: absolute; right: 12ex; width: 20ex; }
 */
 input[type=checkbox] { display: none; }
-input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: '\00a0'; }
-input[type=checkbox]:checked + span::after { content: '▼'; }
-input[type=checkbox]:not(:checked) + span::after { content: '▶'; }
-input[type=checkbox]:disabled + span::after { content: '\00a0'; }
+input[type=checkbox] + span::after { font-size: 0.8em; font-family: monospace; content: " \00a0 "; }
+input[type=checkbox]:checked + span::after { content: " \25bc "; }
+input[type=checkbox]:not(:checked) + span::after { content: " \25b6 "; }
+input[type=checkbox]:disabled + span::after { content: " \00a0 "; }
 </style>
 
 				<hf-body>
