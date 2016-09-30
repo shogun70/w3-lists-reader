@@ -18,6 +18,21 @@ a:link, a:visited {
 /* put some space around top-level frame bodies */
 hf-frame > hf-body { margin: 1em; }
 hf-frame > hf-body hf-frame > hf-body { margin: 0 }
+
+.banner {
+	background-color: #ddd;
+	text-align: center;
+	border-bottom: 1px solid #444;
+}
+.banner h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 1.5em;
+	font-weight: bold;
+	height: 2em;
+	vertical-align: baseline;
+}
+
 </style>
 </head>
 <body>
@@ -54,7 +69,14 @@ lookup: function(url, details) {
 </script>
 
 <hf-layer>
-	<hf-hlayout>
+<hf-vlayout>
+	<hf-panel height="2em" class="banner">
+		<hf-body>
+<h2><output id="_list_name_">Public Mailing Lists</output> @w3.org </h2>
+
+		</hf-body>
+	</hf-panel>
+	<hf-hlayout height="calc(100vh - 2em)">
 
 		<hf-frame width="40ex" targetname="hf_mainindex" src="scope:/Archives/Public/" main="main" style="border-right: 1px solid #888;">
 			<style scoped>
@@ -180,7 +202,19 @@ input[type=checkbox]:checked + span::after { content: " \25bc "; }
 input[type=checkbox]:not(:checked) + span::after { content: " \25b6 "; }
 input[type=checkbox]:disabled + span::after { content: " \00a0 "; }
 </style>
-
+<script for>
+({
+bodyEntered: function(frame, body) {
+	var src = frame.element.getAttribute('src');
+	var m = src.match(/\/([^\/]+)\/$/);
+	if (!m) return;
+	var list = m[1];
+	if (!list) return;
+	// #_list_name_ is an <output> so should just set @value but browsers...
+	Meeko.DOM.find('#_list_name_').textContent = list;
+}
+})
+</script>
 				<hf-body>
 					<hf-transform type="hazard" format="css">
 
@@ -377,6 +411,7 @@ hf-body { /* reset */
 			</hf-frame>
 		</hf-vlayout>
 	</hf-hlayout>
+</hf-vlayout>
 </hf-layer>
 
 </body>
