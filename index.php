@@ -61,7 +61,7 @@ $container['cache'] = function($c) {
 	return new \Slim\HttpCache\CacheProvider();
 };
 
-$app->add(new \Slim\HttpCache\Cache('public', 86400)); # TODO should this be global or per resource??
+$app->add(new \Slim\HttpCache\Cache('public', 3600)); # TODO should this be global or per resource??
 
 $lists_cache_dir = "$root_dir/$lists_host";
 $lists_client = new Client([
