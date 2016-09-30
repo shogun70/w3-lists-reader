@@ -45,9 +45,22 @@ $container['logger'] = function($c) {
 };
 ErrorHandler::register($container['logger']);
 
+$container['notFoundHandler'] = function ($c) {
+	return function ($request, $response) use ($c) {
+		$path = $request->getUri()->getPath();
+		
+		global $template_dir;
+		$template_file = "$template_dir/404.php";
+		$contents = php_render($template_file, [ path => $path ]);
+		$response->write($contents);
+		return $response;
+	};
+};
+
 $container['cache'] = function($c) {
 	return new \Slim\HttpCache\CacheProvider();
 };
+
 $app->add(new \Slim\HttpCache\Cache('public', 86400)); # TODO should this be global or per resource??
 
 $lists_cache_dir = "$root_dir/$lists_host";
